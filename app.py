@@ -14,7 +14,7 @@ data = json.load(f)
 
 available_champions = list(data['data'].keys())
 champions_stats = utils.get_all_champion_stats(data, available_champions)
-champion_types = ['Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank']
+champion_types = ['All', 'Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank']
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True,
                 external_stylesheets=[dbc.themes.DARKLY])
@@ -24,7 +24,26 @@ PAGE_SIZE = 5
 app.layout = html.Div(children=[
     html.Div(children=[
         html.H2('League of Legends Champions'),
-        dcc.Dropdown(id='champ-select', options=[{'label': champ_type, 'value': champ_type} for champ_type in champion_types], value='Mage'),
+        dcc.Dropdown(
+            id='champ-select',
+            options=[{'label': champ_type, 'value': champ_type} for champ_type in champion_types],
+            value='All',
+            style={"color": "black", "margin-bottom": "1rem"}
+        ),
+        html.Div([
+            html.Div(
+                dbc.ListGroup(id='selected-champion-type-1'),
+                style={"display": "inline-block", "width": "33%"}
+            ),
+            html.Div(
+                dbc.ListGroup(id='selected-champion-type-2'),
+                style={"display": "inline-block", "width": "33%"}
+            ),
+            html.Div(
+                dbc.ListGroup(id='selected-champion-type-3'),
+                style={"display": "inline-block", "width": "33%"}
+            )
+        ]),
         html.P(id='champ-info'),
         dash_table.DataTable(
             id='champions-table',
@@ -41,8 +60,9 @@ app.layout = html.Div(children=[
             page_action='custom',
             markdown_options={'link_target': '_self'}),
         dcc.Location(id='location'),
-        dbc.Row(id='selected-champion'),
-        dbc.Row(id='selected-champion-type')
+        html.Div(
+            dbc.Row(id='selected-champion'), style={"margin": '1rem'}
+        ),
     ], style={'margin': '2rem 8rem'})
 ])
 
@@ -83,14 +103,21 @@ def update_selected_champion(pathname):
     return cards
 
 @app.callback(
-    Output('selected-champion-type', 'children'),
+    Output('selected-champion-type-1', 'children'),
+    Output('selected-champion-type-2', 'children'),
+    Output('selected-champion-type-3', 'children'),
     Input('champ-select', 'value')
 )
 def update_selected_champions_by_type(selected_type):
     champions_tags = utils.get_champions_with_tags(data)
-    return html.H4(utils.get_champions_by_type(selected_type, champions_tags)[selected_type])
+    champions = utils.get_champions_by_type(selected_type, champions_tags)[selected_type]
+    champions_len = len(champions)
+    sublist = int(champions_len/3)
+    list_items1 = [dbc.ListGroupItem(c, href=f"/{c}") for c in champions[:sublist]]
+    list_items2 = [dbc.ListGroupItem(c, href=f"/{c}") for c in champions[sublist:2*sublist]]
+    list_items3 = [dbc.ListGroupItem(c, href=f"/{c}") for c in champions[2*sublist:]]
+    return list_items1, list_items2, list_items3
     
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)

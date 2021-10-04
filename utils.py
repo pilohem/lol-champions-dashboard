@@ -30,6 +30,8 @@ def get_champions_with_tags(data):
 def get_champions_by_type(champion_type, champions_tags):
     """Get champions from a single champion type"""
     champions_list = list(champions_tags.keys())
+    if champion_type == 'All':
+        return {champion_type: champions_list}
     champions_type_list = []
     for champion in champions_list:
         if champion_type in champions_tags[champion]:
