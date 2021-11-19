@@ -33,15 +33,23 @@ app.layout = html.Div(children=[
         html.Div([
             html.Div(
                 dbc.ListGroup(id='selected-champion-type-1'),
-                style={"display": "inline-block", "width": "33%"}
+                style={"display": "inline-block", "width": "18%", "margin-right": "0.5rem"}
             ),
             html.Div(
                 dbc.ListGroup(id='selected-champion-type-2'),
-                style={"display": "inline-block", "width": "33%"}
+                style={"display": "inline-block", "width": "18%", "margin-right": "0.5rem"}
             ),
             html.Div(
                 dbc.ListGroup(id='selected-champion-type-3'),
-                style={"display": "inline-block", "width": "33%"}
+                style={"display": "inline-block", "width": "18%", "margin-right": "0.5rem"}
+            ),
+            html.Div(
+                dbc.ListGroup(id='selected-champion-type-4'),
+                style={"display": "inline-block", "width": "18%", "margin-right": "0.5rem"}
+            ),
+            html.Div(
+                dbc.ListGroup(id='selected-champion-type-5'),
+                style={"display": "inline-block", "width": "18%"}
             )
         ]),
         html.P(id='champ-info'),
@@ -106,17 +114,74 @@ def update_selected_champion(pathname):
     Output('selected-champion-type-1', 'children'),
     Output('selected-champion-type-2', 'children'),
     Output('selected-champion-type-3', 'children'),
+    Output('selected-champion-type-4', 'children'),
+    Output('selected-champion-type-5', 'children'),
     Input('champ-select', 'value')
 )
 def update_selected_champions_by_type(selected_type):
     champions_tags = utils.get_champions_with_tags(data)
     champions = utils.get_champions_by_type(selected_type, champions_tags)[selected_type]
-    champions_len = len(champions)
-    sublist = int(champions_len/3)
-    list_items1 = [dbc.ListGroupItem(c, href=f"/{c}") for c in champions[:sublist]]
-    list_items2 = [dbc.ListGroupItem(c, href=f"/{c}") for c in champions[sublist:2*sublist]]
-    list_items3 = [dbc.ListGroupItem(c, href=f"/{c}") for c in champions[2*sublist:]]
-    return list_items1, list_items2, list_items3
+    step = int(len(champions)/5)
+    sublist = [i for i in range(0, len(champions), step)]
+    list_items1 = [dbc.ListGroupItem(
+        dbc.Card(
+            [
+                dbc.CardImg(src=f"assets/img/champion/{c}_0.jpg", top=True),
+                dbc.CardBody(
+                    [
+                        html.H4(f"{c}", className="card-title")
+                    ]
+                )
+            ]
+    ), href=f"/{c}", style={"margin": "0.5rem", "width": "100%"}) for c in champions[sublist[0]:sublist[1]]]
+    list_items2 = [dbc.ListGroupItem(
+        dbc.Card(
+            [
+                dbc.CardImg(src=f"assets/img/champion/{c}_0.jpg", top=True),
+                dbc.CardBody(
+                    [
+                        html.H4(f"{c}", className="card-title")
+                    ]
+                )
+            ]
+    ), href=f"/{c}", style={"margin": "0.5rem", "width": "100%"}) for c in champions[sublist[1]:sublist[2]]]
+    list_items3 = [dbc.ListGroupItem(dbc.Card(
+            [
+                dbc.CardImg(src=f"assets/img/champion/{c}_0.jpg", top=True),
+                dbc.CardBody(
+                    [
+                        html.H4(f"{c}", className="card-title")
+                    ]
+                )
+            ]
+        ), href=f"/{c}", style={"margin": "0.5rem", "width": "100%"}) for c in champions[sublist[2]:sublist[3]]
+    ]
+
+    list_items4 = [dbc.ListGroupItem(dbc.Card(
+            [
+                dbc.CardImg(src=f"assets/img/champion/{c}_0.jpg", top=True),
+                dbc.CardBody(
+                    [
+                        html.H4(f"{c}", className="card-title")
+                    ]
+                )
+            ],
+        ), href=f"/{c}", style={"margin": "0.5rem", "width": "100%"}) for c in champions[sublist[3]:sublist[4]]
+    ]
+
+    list_items5 = [dbc.ListGroupItem(dbc.Card(
+            [
+                dbc.CardImg(src=f"assets/img/champion/{c}_0.jpg", top=True),
+                dbc.CardBody(
+                    [
+                        html.H4(f"{c}", className="card-title")
+                    ]
+                )
+            ],
+        ), href=f"/{c}", style={"margin": "0.5rem", "width": "100%"}) for c in champions[sublist[4]:]
+    ]
+    
+    return list_items1, list_items2, list_items3, list_items4, list_items5
     
 
 if __name__ == '__main__':
